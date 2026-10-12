@@ -1,0 +1,18 @@
+# Zero-Tolerance Performance & Safety Lint Configs
+avoid-breaking-exported-api = true
+blacklisted-names = ["todo", "unimplemented", "panic"]
+cognitive-complexity-threshold = 10
+too-many-arguments-threshold = 6
+type-complexity-threshold = 250
+single-char-binding-names-threshold = 4
+enum-variant-size-threshold = 200
+
+# Disallow dynamic heap allocation macros inside hot-path execution
+disallowed-macros = [
+    { path = "std::format", reason = "Heap allocation penalty in hot path. Use heapless or write! to arrayvec." },
+    { path = "std::vec", reason = "Implicit heap allocation. Use fixed-capacity ArrayVec." }
+]
+
+disallowed-methods = [
+    { path = "std::slice::get_unchecked", reason = "Unchecked access requires formal verification in /verification." }
+]

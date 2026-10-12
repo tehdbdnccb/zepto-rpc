@@ -1,0 +1,29 @@
+name: Formal Bounded Model Checking (Kani)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *' # Daily formal verification sweep
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  kani-proofs:
+    name: Kani Lock-Free & SIMD Proof Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Kani Verifier
+        uses: model-checking/kani-github-action@v1
+        with:
+          kani-version: 'latest'
+
+      - name: Verify Lock-Free SPSC & SIMD Invariants
+        run: |
+          cargo kani --dir verification/kani --enable-unstable

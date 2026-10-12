@@ -1,0 +1,57 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/zepto-core",
+    "crates/zepto-ebpf",
+    "crates/zepto-quant",
+    "crates/zepto-net",
+    "crates/zepto-server",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["ZeptoRPC Infrastructure Team"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zepto-rpc/zepto-rpc"
+
+[workspace.dependencies]
+# Low-Latency Core Dependencies
+bytemuck = { version = "1.18", features = ["derive", "min_const_generics"] }
+memmap2 = "0.9"
+arrayvec = "0.7"
+crossbeam-utils = "0.8"
+parking_lot = "0.12"
+
+# Solana & Networking Primitives
+solana-sdk = "2.0"
+bincode = "1.3"
+quinn = "0.11"
+tokio = { version = "1.40", features = ["full"] }
+
+# Formal Verification & Benchmarking
+criterion = { version = "0.5", features = ["async_tokio", "html_reports"] }
+
+# System Crates
+zepto-core = { path = "crates/zepto-core" }
+zepto-ebpf = { path = "crates/zepto-ebpf" }
+zepto-quant = { path = "crates/zepto-quant" }
+zepto-net = { path = "crates/zepto-net" }
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+strip = true
+debug = false
+
+[profile.bench]
+inherits = "release"
+debug = true
+
+# Profile specifically optimized for AVX-512 kernel execution targets
+[profile.release-high-perf]
+inherits = "release"
+rustflags = ["-C", "target-cpu=native", "-C", "target-feature=+avx512f,+avx512bw,+avx512dq"]

@@ -1,0 +1,27 @@
+[package]
+name = "zepto-fuzz"
+version = "0.1.0"
+authors = ["ZeptoRPC Developers"]
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+zepto-core = { path = "../crates/zepto-core" }
+zepto-quant = { path = "../crates/zepto-quant" }
+zepto-net = { path = "../crates/zepto-net" }
+
+[[bin]]
+name = "frame_parser"
+path = "targets/frame_parser.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "entropy_filter"
+path = "targets/entropy_filter.rs"
+test = false
+doc = false

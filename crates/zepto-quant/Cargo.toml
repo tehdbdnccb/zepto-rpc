@@ -1,0 +1,22 @@
+[package]
+name = "zepto-quant"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[features]
+default = ["std"]
+std = ["zepto-core/std"]
+
+[dependencies]
+zepto-core = { path = "../zepto-core" }
+arrayvec = { workspace = true, default-features = false }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[lib]
+name = "zepto_quant"
+path = "src/lib.rs"

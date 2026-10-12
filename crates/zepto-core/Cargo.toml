@@ -1,0 +1,22 @@
+[package]
+name = "zepto-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[features]
+default = ["std"]
+std = ["bytemuck/std"]
+
+[dependencies]
+bytemuck = { workspace = true, default-features = false }
+arrayvec = { workspace = true, default-features = false }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[lib]
+name = "zepto_core"
+path = "src/lib.rs"

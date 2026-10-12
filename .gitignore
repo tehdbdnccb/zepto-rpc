@@ -1,0 +1,15 @@
+# Rust build output
+/target/
+
+# Node.js and Next.js build output
+**/node_modules/
+**/.next/
+**/out/
+**/dist/
+**/build/
+**/*.tsbuildinfo
+
+# Local environment files
+**/.env
+**/.env.*
+!**/.env.example

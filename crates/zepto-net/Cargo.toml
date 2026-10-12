@@ -1,0 +1,24 @@
+[package]
+name = "zepto-net"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+zepto-core = { path = "../zepto-core" }
+zepto-quant = { path = "../zepto-quant" }
+solana-sdk = { workspace = true }
+tokio = { workspace = true }
+quinn = { workspace = true }
+arrayvec = { workspace = true }
+bytemuck = { workspace = true }
+parking_lot = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[lib]
+name = "zepto_net"
+path = "src/lib.rs"

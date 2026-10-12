@@ -1,0 +1,24 @@
+[package]
+name = "zepto-server"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+zepto-core = { path = "../zepto-core" }
+zepto-quant = { path = "../zepto-quant" }
+zepto-net = { path = "../zepto-net" }
+tokio = { workspace = true, features = ["full"] }
+clap = { workspace = true, features = ["derive", "env"] }
+core_affinity = "0.8"
+solana-sdk = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+arrayvec = { workspace = true }
+parking_lot = { workspace = true }
+
+[[bin]]
+name = "zepto-server"
+path = "src/main.rs"

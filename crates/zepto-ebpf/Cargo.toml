@@ -1,0 +1,25 @@
+[package]
+name = "zepto-ebpf"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+zepto-core = { path = "../zepto-core" }
+bytemuck = { workspace = true }
+
+# System eBPF / AF_XDP bindings
+aya-ebpf = "0.1"
+aya-log-ebpf = "0.1"
+
+[[bin]]
+name = "zepto-ebpf"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+debug = false
