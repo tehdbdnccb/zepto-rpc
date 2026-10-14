@@ -62,7 +62,10 @@ debug = false
 inherits = "release"
 debug = true
 
-# Profile specifically optimized for AVX-512 kernel execution targets
+# Profile specifically optimized for AVX-512 kernel execution targets.
+# The AVX-512 target flags are no longer set in the manifest because the
+# `rustflags` profile key is unstable on stable Cargo. Pass them with the
+# RUSTFLAGS env var when building this profile, for example:
+#   RUSTFLAGS="-C target-cpu=native -C target-feature=+avx512f,+avx512bw,+avx512dq" cargo build --profile release-high-perf
 [profile.release-high-perf]
 inherits = "release"
-rustflags = ["-C", "target-cpu=native", "-C", "target-feature=+avx512f,+avx512bw,+avx512dq"]
