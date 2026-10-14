@@ -2,8 +2,56 @@
 
 use std::net::SocketAddr;
 use std::sync::Arc;
+use quinn::crypto::rustls::QuicClientConfig;
 use quinn::{ClientConfig, Endpoint, Connection};
+use rustls::client::danger::{HandshakeSignatureValid, ServerCertVerified, ServerCertVerifier};
+use rustls::pki_types::{CertificateDer, ServerName, UnixTime};
+use rustls::{DigitallySignedStruct, SignatureScheme};
 use zepto_core::error::{Result, ZeptoError};
+
+/// Certificate verifier that accepts any server certificate.
+///
+/// Solana validators present self-signed certificates on their TPU QUIC ports,
+/// so standard chain validation cannot succeed for direct TPU connections.
+#[derive(Debug)]
+struct SkipServerVerification;
+
+impl ServerCertVerifier for SkipServerVerification {
+    fn verify_server_cert(
+        &self,
+        _end_entity: &CertificateDer<'_>,
+        _intermediates: &[CertificateDer<'_>],
+        _server_name: &ServerName<'_>,
+        _ocsp_response: &[u8],
+        _now: UnixTime,
+    ) -> std::result::Result<ServerCertVerified, rustls::Error> {
+        Ok(ServerCertVerified::assertion())
+    }
+
+    fn verify_tls12_signature(
+        &self,
+        _message: &[u8],
+        _cert: &CertificateDer<'_>,
+        _dss: &DigitallySignedStruct,
+    ) -> std::result::Result<HandshakeSignatureValid, rustls::Error> {
+        Ok(HandshakeSignatureValid::assertion())
+    }
+
+    fn verify_tls13_signature(
+        &self,
+        _message: &[u8],
+        _cert: &CertificateDer<'_>,
+        _dss: &DigitallySignedStruct,
+    ) -> std::result::Result<HandshakeSignatureValid, rustls::Error> {
+        Ok(HandshakeSignatureValid::assertion())
+    }
+
+    fn supported_verify_schemes(&self) -> Vec<SignatureScheme> {
+        rustls::crypto::ring::default_provider()
+            .signature_verification_algorithms
+            .supported_schemes()
+    }
+}
 
 /// Network configuration settings for low-latency QUIC connection pools.
 #[derive(Debug, Clone)]
@@ -38,10 +86,18 @@ impl DirectTpuQuicClient {
             .map_err(|_| ZeptoError::AlignmentFault)?;
 
         // Disable standard TLS verification overhead for local testbeds/direct TPU IP routes
-        let client_config = ClientConfig::builder()
-            .with_no_client_auth()
-            .with_single_cert(vec![], rustls::pki_types::PrivateKeyDer::Pkcs8(vec![].into()))
-            .map_err(|_| ZeptoError::AlignmentFault)?;
+        let rustls_config = rustls::ClientConfig::builder_with_provider(Arc::new(
+            rustls::crypto::ring::default_provider(),
+        ))
+        .with_safe_default_protocol_versions()
+        .map_err(|_| ZeptoError::AlignmentFault)?
+        .dangerous()
+        .with_custom_certificate_verifier(Arc::new(SkipServerVerification))
+        .with_no_client_auth();
+
+        let client_config = ClientConfig::new(Arc::new(
+            QuicClientConfig::try_from(rustls_config).map_err(|_| ZeptoError::AlignmentFault)?,
+        ));
 
         endpoint.set_default_client_config(client_config);
 

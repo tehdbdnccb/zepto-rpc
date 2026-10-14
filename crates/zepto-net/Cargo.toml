@@ -12,6 +12,7 @@ zepto-quant = { path = "../zepto-quant" }
 solana-sdk = { workspace = true }
 tokio = { workspace = true }
 quinn = { workspace = true }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std"] }
 arrayvec = { workspace = true }
 bytemuck = { workspace = true }
 parking_lot = { workspace = true }
