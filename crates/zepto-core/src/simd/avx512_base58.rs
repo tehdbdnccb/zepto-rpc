@@ -26,7 +26,6 @@ impl Avx512Base58Decoder {
 
     /// Direct AVX-512 vectorized execution routine.
     #[target_feature(enable = "avx512f,avx512bw")]
-    #[inline(always)]
     unsafe fn decode_avx512(&self, input: &[u8; 64], output: &mut [u8; 64]) -> Result<()> {
         #[cfg(target_arch = "x86_64")]
         {
