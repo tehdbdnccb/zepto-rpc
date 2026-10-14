@@ -22,7 +22,7 @@ use zepto_quant::hawkes::HawkesProcessModel;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize tracing log output
     tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env().or_else(|_| EnvFilter::new("info")))
+        .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")))
         .init();
 
     info!(target: "zepto_main", "Starting ZeptoRPC Engine v{}", env!("CARGO_PKG_VERSION"));
@@ -57,7 +57,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     daemon.spawn_pinned_worker("ingress_worker", config.ingress_core_id, move |running| {
         info!(target: "zepto_worker", "Ingress worker loop running");
         while running.load(std::sync::atomic::Ordering::Acquire) {
-            std::thread::hint::spin_loop();
+            std::hint::spin_loop();
         }
     });
 
@@ -65,7 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     daemon.spawn_pinned_worker("net_worker", config.net_core_id, move |running| {
         info!(target: "zepto_worker", "Network dispatch worker loop running");
         while running.load(std::sync::atomic::Ordering::Acquire) {
-            std::thread::hint::spin_loop();
+            std::hint::spin_loop();
         }
     });
 
